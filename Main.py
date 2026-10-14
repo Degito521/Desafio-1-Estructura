@@ -37,7 +37,7 @@ df['TASA_SUICIDIOS'] = df['TASA_SUICIDIOS'].apply(
 #Presentamos la información inicial antes de cualquier calculo
 print("--INFORMACIÓN GENERAL--")
 print(f"Filas cargadas: {len(df)}")
-print(df[['GEO_NAME_SHORT', 'DIM_SEX', 'TASA_SUICIDIOS']])
+print(df[['GEO_NAME_SHORT', 'DIM_SEX', 'TASA_SUICIDIOS']].round(4))
 
 
 # Estadísticas generales (Promedio y desviación estandar generales)
@@ -47,11 +47,6 @@ desviacion_tasa = df['TASA_SUICIDIOS'].std()
 print("\n--ESTADÍSTICAS BÁSICAS--")
 print(f"Promedio de la tasa: {promedio_tasa:.2f}") # ":" para separar la variable de modificaciones en su formato, ".2" para indicar cuantos decimales se usaran, "f" para indicar float como tipo de dato
 print(f"Desviación estándar: {desviacion_tasa:.2f}")
-
-# Cantidad de registros por país
-conteo_paises = df['GEO_NAME_SHORT'].value_counts()
-print("\n--REGISTROS POR ZONA GEOGRÁFICA--")
-print(conteo_paises.head(10))
 
 # Exportación a Excel
 df.to_excel("tasas_suicidio_procesadas.xlsx", index=False)
@@ -72,3 +67,48 @@ print("\n--RESULTADOS DE FILTRADO--")
 print(f"Casos superiores al promedio: {len(df_superior_promedio)}")
 print(f"Casos en año >= 2000: {len(df_año_filtrado)}")
 print(f"Hombres con tasa superior al promedio: {len(df_hombres_alta_tasa)}")
+
+
+#Generación de graficos
+
+# Gráfico 1: Histograma
+plt.figure(figsize=(8, 5))
+plt.hist(df['TASA_SUICIDIOS'].dropna(), bins=10, color='skyblue', edgecolor='black')
+plt.axvline(promedio_tasa, color='red', linestyle='dashed', linewidth=1.5, label=f'Promedio ({promedio_tasa:.2f})')
+plt.title("Distribución de la Tasa de Suicidios por 100,000 Habitantes")
+plt.xlabel("Tasa (por 100,000 hab.)")
+plt.ylabel("Frecuencia")
+plt.legend()
+plt.grid(axis='y', alpha=0.75)
+plt.tight_layout()
+plt.show()
+
+#Gráfico 2: Barras por país
+df_total = df[df['DIM_SEX'] == 'TOTAL']
+plt.figure(figsize=(12, 6))
+plt.bar(df_total['GEO_NAME_SHORT'], df_total['TASA_SUICIDIOS'], color='royalblue', edgecolor='black')
+plt.title("Tasa Total de Suicidios por País")
+plt.xlabel("País")
+plt.ylabel("Tasa Total (por 100,000 hab.)")
+plt.xticks(rotation=75, ha='right')
+plt.grid(axis='y', linestyle='--', alpha=0.6)
+plt.tight_layout()
+plt.show()
+
+# Gráfico 3: Barras por Género
+df_generos = df[df['DIM_SEX'].isin(['FEMALE', 'MALE'])]
+promedio_generos = df_generos.groupby('DIM_SEX')['TASA_SUICIDIOS'].mean().reset_index()
+
+etiquetas = ['Mujeres', 'Hombres']
+alturas = promedio_generos['TASA_SUICIDIOS']
+plt.figure(figsize=(6, 5))
+colores = ['red', 'blue'] 
+barras = plt.bar(etiquetas, alturas, color=colores, edgecolor='black', width=0.5)
+plt.title("Tasa Promedio de Suicidios: Hombres vs Mujeres")
+plt.xlabel("Género")
+plt.ylabel("Tasa Promedio (por 100,000 hab.)")
+plt.grid(axis='y', linestyle='--', alpha=0.6)
+plt.tight_layout()
+plt.show()
+
+# Gráfico 4: Dispersión
