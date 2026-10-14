@@ -35,8 +35,40 @@ df['TASA_SUICIDIOS'] = df['TASA_SUICIDIOS'].apply(
     lambda x: x / 1e9 if x > 100 else x
 )
 #Presentamos la información inicial antes de cualquier calculo
-print("--- INFORMACIÓN GENERAL ---")
+print("--INFORMACIÓN GENERAL--")
 print(f"Filas cargadas: {len(df)}")
 print(df[['GEO_NAME_SHORT', 'DIM_SEX', 'TASA_SUICIDIOS']])
 
 
+# Estadísticas generales (Promedio y desviación estandar generales)
+promedio_tasa = df['TASA_SUICIDIOS'].mean()
+desviacion_tasa = df['TASA_SUICIDIOS'].std()
+
+print("\n--ESTADÍSTICAS BÁSICAS--")
+print(f"Promedio de la tasa: {promedio_tasa:.2f}") # ":" para separar la variable de modificaciones en su formato, ".2" para indicar cuantos decimales se usaran, "f" para indicar float como tipo de dato
+print(f"Desviación estándar: {desviacion_tasa:.2f}")
+
+# Cantidad de registros por país
+conteo_paises = df['GEO_NAME_SHORT'].value_counts()
+print("\n--REGISTROS POR ZONA GEOGRÁFICA--")
+print(conteo_paises.head(10))
+
+# Exportación a Excel
+df.to_excel("tasas_suicidio_procesadas.xlsx", index=False)
+print("\nArchivo 'tasas_suicidio_procesadas.xlsx' generado correctamente.")
+
+#Aplicación de filtros.
+
+# Filtro 1: Casos con tasa superior al promedio
+df_superior_promedio = df[df['TASA_SUICIDIOS'] > promedio_tasa]
+
+# Filtro 2: Registros del año 2000 en adelante
+df_año_filtrado = df[df['DIM_TIME'] >= 2000]
+
+# Filtro 3: Hombres con tasa superior al promedio
+df_hombres_alta_tasa = df[(df['DIM_SEX'] == 'MALE') & (df['TASA_SUICIDIOS'] > promedio_tasa)]
+
+print("\n--RESULTADOS DE FILTRADO--")
+print(f"Casos superiores al promedio: {len(df_superior_promedio)}")
+print(f"Casos en año >= 2000: {len(df_año_filtrado)}")
+print(f"Hombres con tasa superior al promedio: {len(df_hombres_alta_tasa)}")
