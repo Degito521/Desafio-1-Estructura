@@ -112,3 +112,29 @@ plt.tight_layout()
 plt.show()
 
 # Gráfico 4: Dispersión
+plt.figure(figsize=(8, 5))
+
+config_generos = {
+    'FEMALE': {'etiqueta': 'Mujeres', 'color': 'red'},
+    'MALE':   {'etiqueta': 'Hombres', 'color': 'blue'}
+}
+
+for genero, cfg in config_generos.items():
+    sub_df = df_generos[df_generos['DIM_SEX'] == genero]
+    plt.scatter(
+        sub_df.index, 
+        sub_df['TASA_SUICIDIOS'], 
+        label=cfg['etiqueta'], 
+        color=cfg['color'], 
+        alpha=0.8, 
+        edgecolors='black', 
+        s=60
+    )
+
+plt.title("Dispersión de la Tasa de Suicidios: Hombres vs Mujeres")
+plt.xlabel("Índice de Muestra / Registro")
+plt.ylabel("Tasa (por 100,000 hab.)")
+plt.legend(title="Género")
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.tight_layout()
+plt.show()
