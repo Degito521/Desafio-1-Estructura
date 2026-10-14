@@ -24,4 +24,19 @@ columnas_interes = [
 #Conservamos unicamente las columnas que nos interesan del DataFrame original
 df = df_raw[columnas_interes].copy()
 
+#Transformamos los valores del CSV a un estandar que pueda reconocer pandas, y ponemos una salva contra posibles errores numericos en el CSV
+df['TASA_SUICIDIOS'] = pd.to_numeric(
+    df['RATE_PER_100000_N'].astype(str).str.replace(',', '.'), 
+    errors='coerce'
+)
+
+#corregimos los valores transformados para que sean coherentes al estudio
+df['TASA_SUICIDIOS'] = df['TASA_SUICIDIOS'].apply(
+    lambda x: x / 1e9 if x > 100 else x
+)
+#Presentamos la información inicial antes de cualquier calculo
+print("--- INFORMACIÓN GENERAL ---")
+print(f"Filas cargadas: {len(df)}")
+print(df[['GEO_NAME_SHORT', 'DIM_SEX', 'TASA_SUICIDIOS']])
+
 
